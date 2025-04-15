@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Classifica Persone</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; border: 1px solid #ddd; }
+    th { background: #007bff; color: white; }
+    .top-event { color: red; font-weight: bold; }
+    .event-date { color: gray; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>🏆 Classifica Persone (Top 10 Gare)</h1>
+  <table>
+    <thead>
+      <tr><th>Posizione</th><th>Nome</th><th>Punteggio</th></tr>
+    </thead>
+    <tbody id="ranking-body"></tbody>
+  </table>
+
+  <script>
+    const dati = JSON.parse(localStorage.getItem("rankingData")) || [];
+
+    dati.forEach(p => {
+      p.eventi.sort((a, b) => b.punteggio - a.punteggio);
+      p.top10 = p.eventi.slice(0, 10);
+      p.totale = p.top10.reduce((s, e) => s + e.punteggio, 0);
+    });
+
+    dati.sort((a, b) => b.totale - a.totale);
+
+    const tbody = document.getElementById("ranking-body");
+    dati.forEach((p, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td><a href="#" onclick="mostraDettagli('${p.nome}')">${p.nome}</a></td>
+        <td>${p.totale}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    function mostraDettagli(nome) {
+      const persona = dati.find(p => p.nome === nome);
+      const eventi = persona.eventi.map(ev => {
+        const top = persona.top10.includes(ev) ? 'top-event' : '';
+        return `<li class="${top}">${ev.nome} – <span class="event-date">${ev.data}</span> – ${ev.punteggio} pt</li>`;
+      }).join('');
+      alert(`Eventi di ${nome}:\n\n${eventi.replace(/<[^>]+>/g, '')}`);
+    }
+  </script>
+</body>
+</html>
