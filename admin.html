@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Area Admin - Classifica</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #form-container, #data-form { display: none; }
+    input, button, select { margin: 5px 0; padding: 6px; }
+    label { display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Area Admin</h1>
+
+  <div id="login-form">
+    <label>Password:</label>
+    <input type="password" id="password">
+    <button onclick="checkPassword()">Entra</button>
+  </div>
+
+  <div id="form-container">
+    <h2>Aggiungi Evento a Persona</h2>
+
+    <form id="data-form">
+      <label>Nome Persona:</label>
+      <input type="text" id="nomePersona" required>
+
+      <label>Nome Evento:</label>
+      <input type="text" id="nomeEvento" required>
+
+      <label>Data Evento:</label>
+      <input type="date" id="dataEvento" required>
+
+      <label>Punteggio:</label>
+      <input type="number" id="punteggio" required>
+
+      <button type="submit">Aggiungi</button>
+    </form>
+
+    <p><button onclick="clearData()">🧹 Cancella tutti i dati</button></p>
+    <p><a href="index.html">🔙 Torna alla classifica</a></p>
+  </div>
+
+  <script>
+    const passwordCorretta = "segreta123"; // Cambiala!
+
+    function checkPassword() {
+      const input = document.getElementById("password").value;
+      if (input === passwordCorretta) {
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("form-container").style.display = "block";
+      } else {
+        alert("Password sbagliata!");
+      }
+    }
+
+    document.getElementById("data-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const nome = document.getElementById("nomePersona").value.trim();
+      const evento = document.getElementById("nomeEvento").value;
+      const data = document.getElementById("dataEvento").value;
+      const punteggio = parseInt(document.getElementById("punteggio").value);
+
+      let dati = JSON.parse(localStorage.getItem("rankingData")) || [];
+
+      let persona = dati.find(p => p.nome === nome);
+      if (!persona) {
+        persona = { nome, eventi: [] };
+        dati.push(persona);
+      }
+
+      persona.eventi.push({ nome: evento, data, punteggio });
+
+      localStorage.setItem("rankingData", JSON.stringify(dati));
+      alert("Evento aggiunto!");
+      this.reset();
+    });
+
+    function clearData() {
+      if (confirm("Sicuro di voler cancellare tutto?")) {
+        localStorage.removeItem("rankingData");
+        alert("Dati eliminati!");
+      }
+    }
+  </script>
+</body>
+</html>
